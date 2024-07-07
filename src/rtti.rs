@@ -23,7 +23,7 @@ impl Region {
         let base = self.base();
 
         for result in results {
-            let ibo_type_descriptor = unsafe { result.cast::<u8>().offset_from(base.cast::<u8>().sub(0x10)) };
+            let ibo_type_descriptor = unsafe { result.cast::<u8>().sub(0x10).offset_from(base.cast::<u8>()) } as u32;
             let xref_ibos = self.search(&ibo_type_descriptor.to_ne_bytes());
 
             for xref in xref_ibos {
@@ -38,7 +38,7 @@ impl Region {
                 let vftable_addr = unsafe { vftable_addrs[0].cast::<usize>().add(1) };
                 let vftable = VFTable::new(vftable_addr);
 
-                Some(vftable);
+                return Some(vftable);
             }
         }
 

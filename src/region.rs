@@ -7,6 +7,7 @@ use windows::Win32::System::Diagnostics::Debug::{
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 use windows::Win32::System::SystemServices::IMAGE_DOS_HEADER;
 
+#[derive(Debug)]
 pub struct Region {
     sections: Vec<*mut [u8]>,
 }
@@ -71,15 +72,13 @@ impl Region {
     pub fn search(&mut self, bytes: &[u8]) -> Vec<*mut [u8]> {
         let mut matches: Vec<*mut [u8]> = Vec::new();
 
-        for i in 0..self.sections.len() {
-            let section = self.sections[i];
-
+        for section in &self.sections {
             for j in 0..section.len() - bytes.len() {
                 let k = j + bytes.len();
+                let subslice = unsafe { &mut (**section)[j..k] };
 
-                let subslice = unsafe { &mut (*section) };
                 if bytes == subslice {
-                    matches.push(unsafe { &mut (*section)[j..k] });
+                    matches.push(subslice);
                 }
             }
         }
