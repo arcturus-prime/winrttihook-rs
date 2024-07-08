@@ -1,4 +1,4 @@
-use std::ffi::CString;
+use std::ffi::CStr;
 
 use windows::core::PCSTR;
 use windows::Win32::System::Diagnostics::Debug::{
@@ -54,13 +54,13 @@ impl Region {
         region
     }
 
-    pub fn from_module(module_name: Option<CString>) -> Self {
+    pub fn from_module(module_name: Option<&CStr>) -> Self {
         let module = if module_name.is_none() {
             std::ptr::null()
         } else {
             module_name.unwrap().as_ptr().cast()
         };
-        
+
         let handle = unsafe { GetModuleHandleA(PCSTR::from_raw(module)) }.unwrap();
 
         unsafe {
@@ -69,13 +69,13 @@ impl Region {
         }
     }
 
-    pub fn search(&mut self, bytes: &[u8]) -> Vec<*mut [u8]> {
+    pub fn search(&self, bytes: &[u8]) -> Vec<*mut [u8]> {
         let mut matches: Vec<*mut [u8]> = Vec::new();
 
         for section in &self.sections {
             for j in 0..section.len() - bytes.len() {
                 let k = j + bytes.len();
-                let subslice = unsafe { &mut (**section)[j..k] };
+                let subslice = unsafe { (**section).get_unchecked_mut(j..k)};
 
                 if bytes == subslice {
                     matches.push(subslice);
@@ -100,5 +100,18 @@ impl Region {
         }
 
         smallest
+    }
+
+    pub fn contains(&self, pointer: *const [u8]) -> bool {
+        for section in &self.sections {
+            let raw_start = (*section as *const [u8]).cast::<u8>();
+            let raw_end = unsafe { raw_start.add((**section).len()) };
+
+            if raw_start < pointer.cast() &&  pointer.cast() < raw_end {
+                return true;
+            }
+        }
+
+        false
     }
 }
