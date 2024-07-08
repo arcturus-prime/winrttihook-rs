@@ -6,7 +6,7 @@ pub struct VFTable {
 }
 
 impl VFTable {
-    pub fn new(region: &Region, mangled_name: &str) -> Option<Self> {
+    pub fn find(region: &Region, mangled_name: &str) -> Option<Self> {
         let results = region.search(mangled_name.as_bytes());
         let base = region.base();
 
