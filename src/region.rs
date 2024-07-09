@@ -75,7 +75,7 @@ impl Region {
         for section in &self.sections {
             for j in 0..section.len() - bytes.len() {
                 let k = j + bytes.len();
-                let subslice = unsafe { (**section).get_unchecked_mut(j..k)};
+                let subslice = unsafe { &mut (**section)[j..k]};
 
                 if bytes == subslice {
                     matches.push(subslice);

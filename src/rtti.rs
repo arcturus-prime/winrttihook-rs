@@ -16,7 +16,7 @@ impl VFTable {
 
         for result in results {
             let result_byte = result.cast::<u8>();
-            let ibo_type_descriptor = unsafe { result_byte.sub(0xC).offset_from(base) } as u32;
+            let ibo_type_descriptor = unsafe { result_byte.sub(0x10).offset_from(base) } as u32;
 
             let xref_ibos = region.search(&ibo_type_descriptor.to_ne_bytes());
 
