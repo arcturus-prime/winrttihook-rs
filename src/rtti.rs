@@ -44,8 +44,8 @@ impl VFTable {
 }
 
 impl VFTable {
-    pub unsafe fn get<T: Copy>(&self, position: usize) -> T {
-        *self.address.add(position).cast()
+    pub unsafe fn get<T: Copy>(&self, position: usize) -> &'static T {
+        self.address.add(position).cast::<T>().as_ref().unwrap_unchecked()
     }
 
     pub unsafe fn set<T>(&self, position: usize, func: T) {
