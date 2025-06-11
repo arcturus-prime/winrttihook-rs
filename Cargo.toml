@@ -1,5 +1,5 @@
 [package]
-name = "winhook_rs"
+name = "winrttihook_rs"
 authors = ["Prime"]
 version = "0.1.0"
 edition = "2021"
